@@ -94,32 +94,6 @@ if __name__ == "__main__":
 #        which_set= 'train',
 #        axes= ['b', 'c', 0, 1])
 
-    
-    # bc01 format
-    # Inputs in the range [-1,+1]
-    # print("Inputs in the range [-1,+1]")
-#    train_set.X = np.reshape(np.subtract(np.multiply(2./255.,train_set.X),1.),(-1,3,32,32))
-#    test_set.X = np.reshape(np.subtract(np.multiply(2./255.,test_set.X),1.),(-1,3,32,32))
-    # print(np.max(train_set.X))
-    # print(np.min(train_set.X))
-#    test_set.y = np.reshape(test_set.y, (-1))
-#    train_set.y = np.reshape(train_set.y, (-1))
- 
-    # replace the train, validation, and test set with random labels
-#    for i in range(0, len(test_set.y)):
-#        test_set.y[i] = random.randint(0, 9)
-
-#    for i in range(0, len(train_set.y)):
-#        train_set.y[i] = random.randint(0, 9)
-    
-    # one hot the targets
- #   test_set.y = np.float32(np.eye(10)[test_set.y])    
- #   train_set.y = np.float32(np.eye(10)[train_set.y])   
-   
- # for hinge loss (targets are already onehot)
- #   test_set.y = np.subtract(np.multiply(2,test_set.y),1.)
- #   train_set.y = np.subtract(np.multiply(2,train_set.y),1.)
-
     print('Building the CNN...') 
   
     train_set.X = np.load('X_values_SVHN.npy')  
