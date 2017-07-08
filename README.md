@@ -13,7 +13,7 @@ Train the model with the following command.
 
 `python svhn_random_labels.py`
 
-After you have trained the CNN, you can evaluate it. This will load the first 7000 entries of the SVHN dataset and evaluate the train error based on the parameters that have been saved in the file "model_parameters_random_labels_svhn.npz". The parameters are saved by the training file, and you can change the name there. 
+After you have trained the CNN, you can evaluate it. This will load the first 7000 entries of the SVHN dataset and evaluate the train error based on the parameters that have been saved in the file `model_parameters_random_labels_svhn.npz`. The parameters are saved by the training file, and you can change the name there. 
 `python svhn_evaluation_random_labels.py`
 
 
