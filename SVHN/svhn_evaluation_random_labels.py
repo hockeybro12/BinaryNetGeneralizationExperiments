@@ -57,7 +57,6 @@ if __name__ == "__main__":
     print("binary = "+str(binary))
     stochastic = False
     print("stochastic = "+str(stochastic))
-    # (-H,+H) are the two binary values
     # H = "Glorot"
     H = 1.
     print("H = "+str(H))
@@ -87,19 +86,22 @@ if __name__ == "__main__":
     print("shuffle_parts = "+str(shuffle_parts))
     
     print('Loading SVHN dataset')
-
+    # only load the 73257 training examples, not the extra 531131 examples
+    # this is done for computational reasons
     train_set = SVHN(which_set= 'train', axes= ['b', 'c', 0, 1])
-        
+      
+    # we only test the train accuracy in this evaluation.  
 #    test_set = SVHN(
 #        which_set= 'train',
 #        axes= ['b', 'c', 0, 1])
 
     print('Building the CNN...') 
-  
+    
+    # load the randomized dataset that was saved when the training was done. 
     train_set.X = np.load('X_values_SVHN.npy')  
     train_set.y = np.load('Y_values_SVHN.npy')
   
-    print(train_set.X.shape)
+    # load the first 7000 samples 
     train_set.X = train_set.X[:7000,:,:,:]
     train_set.y = train_set.y[:7000,:]
     print(train_set.X.shape)
@@ -321,10 +323,6 @@ if __name__ == "__main__":
         if param.name == "W":
             param.set_value(binary_ops.SignNumpy(param.get_value()))
             print(binary_ops.SignNumpy(param.get_value()))
-#    netInfo = {'network': cnn, 'params': lasagne.layers.get_all_param_values(cnn)}
-#    Net_FileName = 'svhn_random_labels.pkl'
-#    pickle.dump(netInfo, open(os.path.join('/notebooks/summer_projectsM/nikhil/BinaryNet/svhn', Net_FileName), 'wb'),protocol=pickle.HIGHEST_PROTOCOL)
-    print("running")
 
     test_error = val_fn(train_set.X, train_set.y)*100.
     print("test_error = " + str(test_error) + "%")

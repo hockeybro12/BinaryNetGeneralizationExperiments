@@ -134,6 +134,7 @@ if __name__ == "__main__":
     valid_set.y = np.subtract(np.multiply(2,valid_set.y),1.)
     test_set.y = np.subtract(np.multiply(2,test_set.y),1.)
 
+    # save the dataset to use in the evaluation code.
     np.save('X_values_SVHN', train_set.X)
     np.save('Y_values_SVHN', train_set.y)
     print('Building the CNN...') 

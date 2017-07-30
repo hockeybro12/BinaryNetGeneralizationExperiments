@@ -121,7 +121,7 @@ class DenseLayer(lasagne.layers.DenseLayer):
     # compute an expression for the output for a single layer given its input
     def get_output_for(self, input, deterministic=False, **kwargs):
         
-        # get the weights that have been binarized
+        # get the weights that are binarized
         self.Wb = binarization(self.W,self.H,self.binary,deterministic,self.stochastic,self._srng)
         Wr = self.W
         self.W = self.Wb
