@@ -17,11 +17,10 @@ After you have trained the CNN, you can evaluate it. This will load the first 70
 
 `python svhn_evaluation_random_labels.py`
 
-If only evaluating the forward pass, it is possible to run the network without binary layers and use layers from lasagne.layers. However, you must load the parameters from the trained model, binarize them, and use binary activations. 
-
-We also provide files to train with dropout and l2 regularization. Run them with the following command.
+We also provide files to train with dropout and l2 regularization. Run them with the following commands.
 
 `python svhn_random_labels_dropout.py`
+
 `python svhn_random_labels_l2_regularization.py` 
 
 ## CIFAR-10
@@ -31,4 +30,4 @@ Train the model with the following command.
 `python cifar10_random_labels.py`
 
 
-We use the code from [Matthieu Courbariaux](https://github.com/MatthieuCourbariaux/BinaryNet) as the basis for our experiments.
+We build on the code from [Matthieu Courbariaux](https://github.com/MatthieuCourbariaux/BinaryNet) for our experiments.
