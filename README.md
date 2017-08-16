@@ -29,5 +29,8 @@ Train the model with the following command.
 
 `python cifar10_random_labels.py`
 
+For dropout, use:
+
+`cifar10_train_acc_dropout.py`
 
 We build on the code from [Matthieu Courbariaux](https://github.com/MatthieuCourbariaux/BinaryNet) for our experiments.

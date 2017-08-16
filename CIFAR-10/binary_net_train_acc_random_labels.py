@@ -6,8 +6,8 @@ from collections import OrderedDict
 import numpy as np
 
 # specifying the gpu to use
-# import theano.sandbox.cuda
-# theano.sandbox.cuda.use('gpu1') 
+import theano.sandbox.cuda
+#theano.sandbox.cuda.use('gpu0') 
 import theano
 import theano.tensor as T
 
@@ -57,7 +57,7 @@ def binarization(W,H,binary=True,deterministic=False,stochastic=False,srng=None)
     
     # (deterministic == True) <-> test-time <-> inference-time
     if not binary or (deterministic and stochastic):
-        # print("not binary")
+        print("not binary")
         Wb = W
     
     else:
@@ -82,7 +82,7 @@ def binarization(W,H,binary=True,deterministic=False,stochastic=False,srng=None)
         # 0 or 1 -> -1 or 1
         # H = 1. 
         Wb = T.cast(T.switch(Wb,H,-H), theano.config.floatX)
-    
+ 
     return Wb
 
 # This class extends the Lasagne DenseLayer to support BinaryConnect
@@ -221,7 +221,7 @@ def train(train_fn,val_fn,
             num_epochs,
             X_train,y_train,
             X_val,y_val,
-            X_test,y_test,
+            X_test,y_test, 
             save_path=None,
             shuffle_parts=1):
     
@@ -268,18 +268,15 @@ def train(train_fn,val_fn,
         
         loss = 0
         batches = len(X)/batch_size
-        train_acc = 0
         
         for i in range(batches):
             # pass in the x_train, y_train, learning rate
-            new_loss, new_train_acc = train_fn(X[i*batch_size:(i+1)*batch_size],y[i*batch_size:(i+1)*batch_size],LR)
+            new_loss = train_fn(X[i*batch_size:(i+1)*batch_size],y[i*batch_size:(i+1)*batch_size],LR)
             loss += new_loss
-            train_acc += new_train_acc
 
         loss/=batches
-        train_acc = train_acc / batches * 100
         
-        return loss, train_acc
+        return loss
     
     # This function tests the model a full epoch (on the whole dataset)
     def val_epoch(X,y):
@@ -292,7 +289,7 @@ def train(train_fn,val_fn,
             new_loss, new_err = val_fn(X[i*batch_size:(i+1)*batch_size], y[i*batch_size:(i+1)*batch_size])
             err += new_err
             loss += new_loss
-        
+       
         err = err / batches * 100
         loss /= batches
 
@@ -309,11 +306,41 @@ def train(train_fn,val_fn,
         
         start_time = time.time()
         
-        train_loss, train_acc = train_epoch(X_train,y_train,LR)
+        train_loss = train_epoch(X_train,y_train,LR)
+
+        train_err, train_loss_new = val_epoch(X_train, y_train)
         X_train,y_train = shuffle(X_train,y_train)
         
         val_err, val_loss = val_epoch(X_val,y_val)
+        test_err, test_loss = val_epoch(X_test,y_test)
+
+        train_errors_array = []
+        test_errors_array = []
+        # find the values of the class
+        class_values_train = np.argmax(y_train, axis=1)
+        class_values_test = np.argmax(y_test, axis=1)
+        # determine the test/train error values for each of the separate classes
+        for i in range(len(y_train[0])):
+            # find the indices of this specific class
+            class_values_train_indices = np.where(class_values_train==i)
+            class_values_test_indices = np.where(class_values_test==i)
+
+            # get the indices that correspond to this specific class.
+            class_X_train = X_train[class_values_train_indices]
+            class_y_train = y_train[class_values_train_indices]
+            # calculate the train/test error for this specific class
+            class_train_err, class_train_loss = val_epoch(class_X_train, class_y_train)
+            train_errors_array.append(class_train_err)
+
+            class_X_test = X_test[class_values_test_indices]
+            class_y_test = y_test[class_values_test_indices]
+            class_test_err, class_test_loss = val_epoch(class_X_test, class_y_test)
+            test_errors_array.append(class_test_err)
         
+        if save_path is not None:
+            np.savez(save_path, *lasagne.layers.get_all_param_values(model))
+            print("Saving binary net parameters at path " + save_path)
+
         # test if validation error went down
         if val_err <= best_val_err:
             
@@ -321,17 +348,14 @@ def train(train_fn,val_fn,
             best_val_err = val_err
             best_epoch = epoch+1
             
-            test_err, test_loss = val_epoch(X_test,y_test)
             
-            if save_path is not None:
-                np.savez(save_path, *lasagne.layers.get_all_param_values(model))
-        
+
         epoch_duration = time.time() - start_time
         
         # Then we print the results for this epoch:
         print("Epoch "+str(epoch + 1)+" of "+str(num_epochs)+" took "+str(epoch_duration)+"s")
         print("  LR:                            "+str(LR))
-        print("  training error rate:           "+str(train_acc)+"%")
+        print("  training error:                "+str(train_err)+"%")
         print("  training loss:                 "+str(train_loss))
         print("  validation loss:               "+str(val_loss))
         print("  validation error rate:         "+str(val_err)+"%")
@@ -339,6 +363,9 @@ def train(train_fn,val_fn,
         print("  best validation error rate:    "+str(best_val_err)+"%")
         print("  test loss:                     "+str(test_loss))
         print("  test error rate:               "+str(test_err)+"%") 
+        for i in range(len(y_train[0])):
+            print("        Class " + str(i) + " train error:     " + str(train_errors_array[i]) + "%")
+            print("        Class " + str(i) + " test error:      " + str(test_errors_array[i]) + "%")        
         
         # decay the LR
         LR *= LR_decay
