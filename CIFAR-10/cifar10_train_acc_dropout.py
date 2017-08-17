@@ -314,8 +314,6 @@ if __name__ == "__main__":
                 nonlinearity=lasagne.nonlinearities.identity,
                 num_units=10)
 
-    cnn = lasagne.layers.DropoutLayer(cnn, p=0.5)
-
     cnn = lasagne.layers.BatchNormLayer(
             cnn,
             epsilon=epsilon, 

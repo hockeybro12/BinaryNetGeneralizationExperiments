@@ -35,7 +35,7 @@ import random
 import os
 save_path_string = os.path.dirname(os.path.abspath(__file__))
 save_path_base = save_path_string
-save_path_string += "/model_parameters_random_labels_svhn_dropout"
+save_path_string += "/model_parameters_random_labels_svhn_stochastic"
 
 if __name__ == "__main__":
     
@@ -49,15 +49,15 @@ if __name__ == "__main__":
     print("epsilon = "+str(epsilon))
     
     # BinaryOut
-    activation = binary_net.binary_tanh_unit
-    print("activation = binary_net.binary_tanh_unit")
-    # activation = binary_net.binary_sigmoid_unit
-    # print("activation = binary_net.binary_sigmoid_unit")
+    #activation = binary_net.binary_tanh_unit
+    #print("activation = binary_net.binary_tanh_unit")
+    activation = binary_net.binary_sigmoid_unit
+    print("activation = binary_net.binary_sigmoid_unit")
     
     # BinaryConnect    
     binary = True
     print("binary = "+str(binary))
-    stochastic = False
+    stochastic = True
     print("stochastic = "+str(stochastic))
     # (-H,+H) are the two binary values
     # H = "Glorot"
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     print("W_LR_scale = "+str(W_LR_scale))
     
     # Training parameters
-    num_epochs = 500
+    num_epochs = 1500
     print("num_epochs = "+str(num_epochs))
     
     # Decaying LR 
@@ -121,9 +121,9 @@ if __name__ == "__main__":
 
     for i in range(0, len(valid_set.y)):
         valid_set.y[i] = random.randint(0, 9)
-
-    for i in range(0, len(test_set.y)):
-        test_set.y[i] = random.randint(0, 9)
+#
+#    for i in range(0, len(test_set.y)):
+#        test_set.y[i] = random.randint(0, 9)
 
     # one hot the targets
     train_set.y = np.float32(np.eye(10)[train_set.y])   
@@ -287,9 +287,7 @@ if __name__ == "__main__":
                 W_LR_scale=W_LR_scale,
                 nonlinearity=lasagne.nonlinearities.identity,
                 num_units=1024)      
-                 
-    cnn = lasagne.layers.DropoutLayer(cnn, p=0.25)
- 
+                  
     cnn = lasagne.layers.BatchNormLayer(
             cnn,
             epsilon=epsilon, 
@@ -307,8 +305,6 @@ if __name__ == "__main__":
                 W_LR_scale=W_LR_scale,
                 nonlinearity=lasagne.nonlinearities.identity,
                 num_units=1024)      
-    
-    cnn = lasagne.layers.DropoutLayer(cnn, p=0.50)
                   
     cnn = lasagne.layers.BatchNormLayer(
             cnn,
@@ -327,7 +323,7 @@ if __name__ == "__main__":
                 W_LR_scale=W_LR_scale,
                 nonlinearity=lasagne.nonlinearities.identity,
                 num_units=10)      
-
+    
     print(cnn.get_params())
     viewParametersLayer = cnn
                   
@@ -358,7 +354,7 @@ if __name__ == "__main__":
         params = lasagne.layers.get_all_params(cnn, trainable=True)
         updates = lasagne.updates.adam(loss_or_grads=loss, params=params, learning_rate=LR)
 
-    test_output = lasagne.layers.get_output(cnn, deterministic=True)
+    test_output = lasagne.layers.get_output(cnn, deterministic=False)
     test_loss = T.mean(T.sqr(T.maximum(0.,1.-target*test_output)))
     test_err = T.mean(T.neq(T.argmax(test_output, axis=1), T.argmax(target, axis=1)),dtype=theano.config.floatX)
    
