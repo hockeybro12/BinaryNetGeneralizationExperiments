@@ -1,5 +1,11 @@
 # BinaryNet Generalization Experiments
 
+## Paper 
+
+Paper: Memorization in [Binarized Neural Networks](https://docs.google.com/viewer?a=v&pid=sites&srcid=ZGVmYXVsdGRvbWFpbnx0aW55bWwyMDE3fGd4OjZmZTRhYTU5YzcyNzNiYzc)
+Presented at: [TinyML Workshop at ICML 2017](https://sites.google.com/site/tinyml2017/accepted-papers)
+
+## Information
 
 This repository provides the code to reproduce generalization experiments on [BinaryNet](https://arxiv.org/abs/1602.02830)
 
